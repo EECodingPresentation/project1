@@ -1,4 +1,4 @@
-function output=channel(input,mode,theta,sigma)  %高斯噪声信道
+function [output, phi]=channel(input,mode,theta,sigma)  %高斯噪声信道
     %% 输入输出规范:
         % input:x
         % mode: 1表示场景1:即依次通信过程中φ不变，每次通信有独立的φ
