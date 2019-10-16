@@ -1,6 +1,6 @@
-function decode_bit = hard_viterbi(bitcode, eff, tail)
+function decode_bit = soft_viterbi(bitProb, eff, tail)
     %% 初始化
-    len=length(bitcode);
+    len=size(bitProb, 2);
     decode_bit = zeros(1, len);
     num = 8;
     if eff==2
@@ -12,8 +12,8 @@ function decode_bit = hard_viterbi(bitcode, eff, tail)
     dis = zeros(num, len + 1);  % 记录距离
     pos = zeros(num, len + 1);  % 记录路径
     
-    dis(2: end, 1) = Inf;
-    dis(: , 2: end) = Inf;
+    dis(2: end, 1) = -Inf;
+    dis(: , 2: end) = -Inf;
     
     Status = [0, 0, 0; 0, 0, 1; 0, 1, 0; 0, 1, 1; ...
         1, 0, 0; 1, 0, 1; 1, 1, 0; 1, 1, 1];
@@ -35,8 +35,10 @@ function decode_bit = hard_viterbi(bitcode, eff, tail)
             for branch = 0: 1
                 statusNext = [statusNow(2: 3), branch];
                 sNextNum = statusNext * P + 1;
-                hamming = sum(trans{sNowNum, branch + 1} ~= bitcode(:, i));
-                if dis(sNowNum, i) + hamming < dis(sNextNum, i + 1)
+                temp = trans{sNowNum, branch + 1};
+                temp(temp == 0) = -1;
+                hamming = temp.' * bitProb(: , i);
+                if dis(sNowNum, i) + hamming > dis(sNextNum, i + 1)
                     dis(sNextNum, i + 1) = dis(sNowNum, i) + hamming;
                     pos(sNextNum, i + 1) = sNowNum;
                 end
@@ -48,7 +50,7 @@ function decode_bit = hard_viterbi(bitcode, eff, tail)
     if (tail)
         posEnd = 1;
     else
-        [~, posEnd] = min(dis(: , end));
+        [~, posEnd] = max(dis(: , end));
     end
     for i = len + 1: -1: 2
         decode_bit(i-1) = mod(posEnd - 1, 2);

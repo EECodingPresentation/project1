@@ -5,7 +5,7 @@ function bitcode = hard_judge(channelres, bitmode, eff, knownPhi, phi)
         0, 1, 1, 0, 0, 1, 1, 0];%1/3效率
     %% 分情况，是否已知Phi角
     if knownPhi
-        channelres = channelres * exp(-1j*phi);
+        channelres = channelres .* exp(-1j*phi);
     end
     %% 硬判决划分为bit
     switch bitmode
