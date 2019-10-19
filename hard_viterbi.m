@@ -1,4 +1,4 @@
-function decode_bit = hard_viterbi(bitcode, eff, tail)
+function decode_bit = hard_viterbi(bitcode, eff, tail, holegap)
     %% 初始化
     len=length(bitcode);
     decode_bit = zeros(1, len);
@@ -9,8 +9,14 @@ function decode_bit = hard_viterbi(bitcode, eff, tail)
         G=[1,0,1,1;1,1,0,1;1,1,1,1;];%1/3效率
     end
     P = [4; 2; 1];
-    dis = zeros(num, len + 1);  % 记录距离
-    pos = zeros(num, len + 1);  % 记录路径
+    if holegap > 2
+        holes = ceil((len-1)/(holegap-1));
+        dis = zeros(num, len + holes + 1);  % 记录距离
+        pos = zeros(num, len + holes + 1);  % 记录路径
+    else
+        dis = zeros(num, len + 1);  % 记录距离
+        pos = zeros(num, len + 1);  % 记录路径
+    end
     
     dis(2: end, 1) = Inf;
     dis(: , 2: end) = Inf;
@@ -26,19 +32,34 @@ function decode_bit = hard_viterbi(bitcode, eff, tail)
         end
     end
     
-    
+    cnt = 0;
     %% viterbi译码
-    for i = 1: len
-        for sNowNum = 1: num
-            statusNow = Status(sNowNum, : );
+    for i = 1: length(pos) - 1
+        if holegap > 2 && mod(i, holegap) == 2
+            cnt = cnt + 1;
+            for sNowNum = 1: num
+                statusNow = Status(sNowNum, : );
+                for branch = 0: 1
+                    statusNext = [statusNow(2: 3), branch];
+                    sNextNum = statusNext * P + 1;
+                    if dis(sNowNum, i) < dis(sNextNum, i + 1)
+                        dis(sNextNum, i + 1) = dis(sNowNum, i);
+                        pos(sNextNum, i + 1) = sNowNum;
+                    end
+                end
+            end
+        else
+            for sNowNum = 1: num
+                statusNow = Status(sNowNum, : );
 
-            for branch = 0: 1
-                statusNext = [statusNow(2: 3), branch];
-                sNextNum = statusNext * P + 1;
-                hamming = sum(trans{sNowNum, branch + 1} ~= bitcode(:, i));
-                if dis(sNowNum, i) + hamming < dis(sNextNum, i + 1)
-                    dis(sNextNum, i + 1) = dis(sNowNum, i) + hamming;
-                    pos(sNextNum, i + 1) = sNowNum;
+                for branch = 0: 1
+                    statusNext = [statusNow(2: 3), branch];
+                    sNextNum = statusNext * P + 1;
+                    hamming = sum(trans{sNowNum, branch + 1} ~= bitcode(:, i - cnt));
+                    if dis(sNowNum, i) + hamming < dis(sNextNum, i + 1)
+                        dis(sNextNum, i + 1) = dis(sNowNum, i) + hamming;
+                        pos(sNextNum, i + 1) = sNowNum;
+                    end
                 end
             end
         end
@@ -50,7 +71,7 @@ function decode_bit = hard_viterbi(bitcode, eff, tail)
     else
         [~, posEnd] = min(dis(: , end));
     end
-    for i = len + 1: -1: 2
+    for i = length(pos): -1: 2
         decode_bit(i-1) = mod(posEnd - 1, 2);
         posEnd = pos(posEnd, i);
     end
