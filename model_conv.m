@@ -12,7 +12,7 @@ function output=model_conv(input,eff,tail)
    %% 思路:
     % input=[1,1,0];
     % G=[1,0,1;1,1,1];
-    % 将input写成[0,0,1;0,1,1;1,1,0;]的形式
+    % 将input写成[1,1,0;0,1,1;0,0,1;]的形式
     % G*input=[1,1,1;1,0,0];
     % 按列向量组合得到结果
     
@@ -28,7 +28,7 @@ function output=model_conv(input,eff,tail)
     end
     input_s=zeros(4,len);%拓展长度
     for k=1:4 %移位拓展
-        input_s(k,1:len)=[zeros(1,4-k),input(1:len-4+k)];
+        input_s(k,1:len)=[zeros(1,k-1),input(1:len-k+1)];
     end
     output=mod(G*input_s,2);%mod2和
     output=reshape(output,1,len*eff);
