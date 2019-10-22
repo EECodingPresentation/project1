@@ -6,7 +6,7 @@ function decode_bit = soft_viterbi(bitProb, eff, tail, holegap)
     if eff==2
         G=[1,1,0,1;1,1,1,1;];%1/2效率
     elseif eff==3
-        G=[1,1,1,1;1,1,0,1;1,0,1,1;];%1/3效率
+        G=[1,0,1,1;1,1,0,1;1,1,1,1;];%1/3效率
     end
     G = fliplr(G);
     P = [4; 2; 1];
