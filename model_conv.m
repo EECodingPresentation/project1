@@ -19,7 +19,7 @@ function output=model_conv(input,eff,tail)
    %% ДњТы:
     
     input=[input,zeros(1,3*(tail==1))];
-   
+  
     len=length(input);
     if eff==2
         G=[1,1,0,1;1,1,1,1;];%1/2аЇТЪ
