@@ -24,7 +24,7 @@ mapres=model_map(convres,bitmode);  %电平映射
 [channelres, phi]=channel(mapres,channelmode,theta,sigma);  %信道传输
 
 %如果固定但是不已知phi角，先计算出最可能的phi
-if (~knownPhi)&(channelmode)
+if (~knownPhi) && (channelmode)
     phi=calculatefai(channelres,bitmode,theta);
     knownPhi=1;
 end

@@ -8,6 +8,7 @@ function decode_bit = hard_viterbi(bitcode, eff, tail, holegap)
     elseif eff==3
         G=[1,0,1,1;1,1,0,1;1,1,1,1;];%1/3Ð§ÂÊ
     end
+    G = fliplr(G);
     P = [4; 2; 1];
     if holegap > 2
         holes = ceil((len-1)/(holegap-1));
