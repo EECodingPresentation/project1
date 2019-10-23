@@ -11,6 +11,7 @@ function output = DiggingHole(input,holegap, eff)
     if holegap > 2
         n=1:length(input)/eff;
         n=(mod(n,holegap)==2);
+        n(end)=0;
         index = boolean(kron(n, ones(1, eff)));
         input(index)=[];
     end
