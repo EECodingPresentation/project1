@@ -6,6 +6,8 @@ function bitProb = soft_judge(channelres, bitmode, eff, knownPhi, phi, theta)
     %% 分情况，是否已知Phi角
     if knownPhi
         channelres = channelres .* exp(-1j*phi);
+    else
+        channelres = channelres .* exp(-1j*theta/2);
     end
     %% 硬判决划分为bit
     switch bitmode
